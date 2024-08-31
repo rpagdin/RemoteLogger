@@ -8,7 +8,7 @@
 &ensp;&ensp;[*Licensing](#licensing)<br>
 [**Getting started**](#getting-started)<br>
 &ensp;&ensp;[Setting up the Arduino IDE](#setting-up-the-arduino-ide)<br>
-&ensp;&ensp;[*Installing the RemoteLogger library](#installing-the-remotelogger-library)<br>
+&ensp;&ensp;[Installing the RemoteLogger library](#installing-the-remotelogger-library)<br>
 &ensp;&ensp;[Installing library dependencies](#installing-library-dependencies)<br>
 &ensp;&ensp;[Upload code to your Feather M0](#upload-code-to-your-feather-m0)<br>
 &ensp;&ensp;[*Troubleshooting](#troubleshooting)<br>
@@ -72,6 +72,11 @@ Restart (close and reopen) the Arduino IDE to apply the changes.<br>
 To check whether the board managers installed correctly, under Tools > Board you should see an option for Adafruit SAMD Boards, under which you can select Adafruit Feather M0 (SAMD21). If this is not an option, uninstall and reinstall the board managers and restart the IDE.
 
 ### Installing the RemoteLogger library
+To install the RemoteLogger library, first navigate to https://github.com/rpagdin/RemoteLogger. Download the whole repository as a ZIP file by pressing the green Code button and selecting Download as ZIP. <br>
+<img src='docs/download-zip.PNG' width='350'><br>
+In the Arduino IDE, go through Sketch > Include Library > Add .ZIP Library and select the ZIP file you just downloaded in the file explorer. Do not extract the ZIP folder before using it. The library should install as normal. To check whether it installed correctly, you can try to use it with the `#include <RemoteLogger.h>` at the head of a sketch and try to compile it. If the library has installed, it will not throw an error saying the library is unknown.<br>
+Use this same procedure to install any other libraries that must be installed from ZIP files in the section below. 
+
 ### Installing library dependencies
 The RemoteLogger library depends on several other Arduino libraries that must be installed before code written with the RemoteLogger library can be used. Most standard libraries can be downloaded through the Arduino IDE's built-in library manager, but some must be downloaded and installed as ZIP libraries following the same steps as for the RemoteLogger library in the previous section. When downloading libraries, it may ask if you want to download with dependencies. Select yes.<br>
 Open the library manager and install the following libraries:
