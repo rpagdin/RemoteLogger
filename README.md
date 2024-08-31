@@ -162,10 +162,6 @@ For more information about the data and database, contact Alex Bevington at alex
 
 ## Library functions
 ### Constructors and startup
-#### `RemoteLogger()`
-Default no-arg constructor. Deprecated, only for testing purposes. Sets header for Hydros21 setup.
-#### `RemoteLogger(String header)`
-Deprecated. Do not use. Sets header to provided string but does not provide adequate information for message preparation.
 #### `RemoteLogger(String header, byte num_params, float *multipliers, String letters)`
 Initiates a RemoteLogger object with the provided header and parameters for message preparation. Headers are internal and will not affect how messages are prepared, sent, or received by the external endpoint; however, for proper message preparation the first three parameters should be: timestamp, battery voltage, free memory. Headers should contain no spaces.<br>
 The number of parameters must correspond to the total number of sampled parameters from sensors (i.e. excluding the battery voltage and free memory). The multipliers argument, of length num_params, provides the multipliers to remove decimal places from parameters to send, or to truncate zeroes (e.g. if temperature is measured to two decimal places, multiply by 100 to remove decimal places. Likewise, to truncate a 5-digit measurement to 3 digits, multiply by 0.01). These multipliers should be reflected on the external endpoint for messages so that data can be extracted. For parameters that are measured and saved to the data file but not intended to be sent, provide a multiplier of 0.<br>
