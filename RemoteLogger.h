@@ -24,15 +24,11 @@
 #include <DallasTemperature.h>  // for DS18B20
 
 #define IridiumSerial Serial1       // define port for Iridium serial communication
-// #define TOTAL_KEYS 6                // number of entries in dictionary
-//IridiumSBD modem(IridiumSerial);
 
 class RemoteLogger
 {
     public:
         /* CONSTRUCTORS AND STARTUP */
-        RemoteLogger();
-        RemoteLogger(String header);
         RemoteLogger(String header, byte num_params, float *multipliers, String letters);
         void begin();      // call after changing any pins you want to change
 
@@ -59,9 +55,7 @@ class RemoteLogger
 
         /* SAMPLING FUNCTIONS */
         String sample_hydros_M(SDI12 bus, int sensor_address);
-        // String sample_ott_M(SDI12 bus, int sensor_address);
-        // String sample_ott_V(SDI12 bus, int sensor_address);
-        String sample_ott(SDI12 bus, int sensor_address);     // could make two constituent functions private
+        String sample_ott(SDI12 bus, int sensor_address);     // constituent functions private
         String sample_analite_195(int analogDataPin, int wiperSetPin, int wiperUnsetPin);
         String sample_ultrasonic(int powerPin, int triggerPin, int pulseInputPin);
         String sample_sht31(Adafruit_SHT31 sensor, int sensorAddress);
@@ -80,10 +74,7 @@ class RemoteLogger
     private:
 
         void sync_clock();      // sync RTC to Iridium time - helper to send_msg and test_irid
-        //int count_params();            // count parameters in comma-separated header - helper to prep_msg
         String produce_csv_setting();          // generate argument for CSV parsing - helper to prep_msg
-        // void populate_header_index(int **headerIndex, int num_params);             // determine where each header lives in dictionary - helper to prep_msg
-        // int find_key(String *key);                   // find index of column name in dictionary
         String sample_ott_M(SDI12 bus, int sensor_address);
         String sample_ott_V(SDI12 bus, int sensor_address);
 
@@ -97,8 +88,6 @@ class RemoteLogger
         File dataFile;
         QuickStats stats;       
 
-        // IridiumSBD modem{IridiumSerial};
-
         byte ledPin = 8;        // built-in green LED pin on Feather M0 Adalogger - can modify for other boards
         byte vbatPin = 9;          // built-in battery pin on Feather M0 Adalogger - can modify for other boards
         byte tplPin = A0;           // attach TPL to A0 (only analog output pin on Adalogger)
@@ -109,11 +98,6 @@ class RemoteLogger
 
         const float BATT_MULT = 100;
         const float MEM_MULT = 0.01;
-
-        /* dictionary of headers to message letters and value multipliers */
-        // String HEADERS[TOTAL_KEYS] = {"water_level_mm", "water_temp_c", "water_ec_dcm", "batt_v", "datetime", "memory"};
-        // String LETTERS[TOTAL_KEYS] = {"A", "B", "C", "", "", ""};
-        // float MULTIPLIERS[TOTAL_KEYS] = {1, 10, 1, 100, 1, 0.01};
 };
 
 #endif
