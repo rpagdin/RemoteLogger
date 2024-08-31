@@ -10,15 +10,6 @@
 
 /* CONSTRUCTORS AND STARTUP */
 
-RemoteLogger::RemoteLogger(){
-    /** TODO: remove, this is default header for Hydros21 */
-    myHeader = "datetime,batt_v,memory,water_level_mm,water_temp_c,water_ec_dcm";
-}
-
-RemoteLogger::RemoteLogger(String header){
-    myHeader = header;
-}
-
 RemoteLogger::RemoteLogger(String header, byte num_params, float *multipliers, String letters){
     myHeader = header;
     myMultipliers = multipliers;
@@ -79,7 +70,6 @@ void RemoteLogger::blinky(int n, int high_ms, int low_ms, int btw_ms){
  * outname: name of the CSV file (e.g. /HOURLY.csv)
 */
 void RemoteLogger::write_to_csv(String header, String datastring_for_csv, String outname){
-    //File dataFile;      // File instance -- only used within this function
 
     /* If file doesn't exist, write header and data, otherwise only write data */
     if (!SD.exists(outname)){
@@ -120,7 +110,6 @@ int RemoteLogger::sample_memory(){
 /**
  * alert TPL done
  * use A0 as output on Feather M0 Adalogger (only analog output)
- * TODO: set A0 to low in setup code first thing to avoid alerting prematurely?
 */
 void RemoteLogger::tpl_done(){
     pinMode(tplPin, OUTPUT);       // just in case
@@ -203,7 +192,6 @@ void RemoteLogger::reset_hourly(){
 /**
  * send provided message over the Iridium network
  * connect Iridium sleep pin (7 - grey) to pin 13 or change value of IridSlpPin
- * TODO: investigate -- did removing the Watchdog mess things up? try it with the TPL
 */
 int RemoteLogger::send_msg(String myMsg){
     digitalWrite(IridSlpPin, HIGH);     // wake up the modem
@@ -225,8 +213,6 @@ int RemoteLogger::send_msg(String myMsg){
     }
 
     // calibrate the RTC time roughly every 5 days
-    /** TODO: will this miss days by accident? what if we miss noon? (i.e. only sending every two hours)*/
-    /** TODO: do we need the pre/post time strings? */
     if (rtc.now().hour() == 12 & rtc.now().day() % 5 == 0) {
         sync_clock();
     }
@@ -333,17 +319,12 @@ String RemoteLogger::prep_msg(){
     int maxInMsg = 18;
 
     // process header to determine number of columns (parameters)
-    // Serial.println(F("preparing csv setting..."));         /** TODO: remove */
     String csv_setting = produce_csv_setting();
-    // Serial.println(csv_setting);    /** TODO: remove */
 
     SD.begin(chipSelect);       //start the SD card connection
-    
-    // Serial.println(freeMemory());       /** TODO: remove */
-    // Serial.println(F("preparing CSV parser..."));      /** TODO: remove */
-    char buf[csv_setting.length()+1];   Serial.println(1);  /** TODO: remove */
+
+    char buf[csv_setting.length()+1];  
     csv_setting.toCharArray(buf, csv_setting.length()+1);  
-    // Serial.println(freeMemory());       /** TODO: remove */
     CSV_Parser cp(buf, true, ',');      
     cp.readSDfile("/HOURLY.csv");       
     int num_rows = cp.getRowsCount(); 
@@ -352,29 +333,16 @@ String RemoteLogger::prep_msg(){
     if (num_rows > maxInMsg) first = num_rows - maxInMsg; 
     else first = 0;
 
-    // Serial.println(6);      /** TODO: remove */
-
-    // Serial.println(F("preparing header index..."));        /** TODO: remove */
-    // figure out where each parameter's info is in the dictionary
-    // int **headerIndex;
-    // headerIndex[num_params];
-    // populate_header_index(headerIndex, num_params);
-
-    // Serial.println(F("building message..."));      /** TODO: remove */
-    // generate the letters
+    // add the letters
     String datastring_msg = "";
     datastring_msg.reserve(200);
-    // for(int i = 0; i < num_params; i++){
-    //     datastring_msg += LETTERS[*headerIndex[i]];
-    // }
 
     datastring_msg += myLetters;
     datastring_msg += ":";
 
     int column = 0;        // position of the header we're on
 
-    // Serial.println(F("date and time..."));     /** TODO: remove */
-    //datetime (of first measurement in message)
+    // datetime (of first measurement in message)
     char **out_datetimes = (char **)cp[column];       // get list of datetimes 
     datastring_msg += String(out_datetimes[first]).substring(2,4); 
     datastring_msg += String(out_datetimes[first]).substring(5,7);
@@ -388,7 +356,6 @@ String RemoteLogger::prep_msg(){
 
     float *floatOut;        //temporary variable for float columns to live in
 
-    // Serial.println(F("battery voltage and memory..."));   /** TODO: remove */
     //battery voltage (most recent)
     floatOut = (float *)cp[column];
     datastring_msg += String(round(floatOut[num_rows-1] * BATT_MULT));
@@ -401,18 +368,11 @@ String RemoteLogger::prep_msg(){
     datastring_msg += String(round(floatOut[num_rows-1] * MEM_MULT)); 
     datastring_msg += ":";
 
-    // Serial.print(F("adding data... "));           /** TODO: remove */
     //sampled data
     for (int row = first; row < num_rows; row++) {        // for each row in the data file
         column = 3;    //start each time at the start of the sampled data (fourth column)
-        // Serial.print(F("row ")); Serial.print(row); Serial.print(F("   "));   /** TODO: remove */
 
         while (column < myParams+3) {      // for each column (sampled data point) in the row 
-            // floatOut = (float *)cp[column];
-            // datastring_msg += String(round(floatOut[row] * myMultipliers[column-3]));
-
-            // if(column != myParams+2) { datastring_msg += ","; }           // add commas between data points
-            // else { datastring_msg += ":"; }     // add a colon only to data from last column
 
             // manage selection of which parameters to send with multipliers
             if(myMultipliers[column-3] != 0){         // want to send this in the message
@@ -426,11 +386,9 @@ String RemoteLogger::prep_msg(){
         }
         datastring_msg.setCharAt(datastring_msg.length()-1, ':');       // set the last character 
     }
-    // Serial.println();       /** TODO: remove */
 
     // free up memory
     delete floatOut;
-    // delete headerIndex;
     
     return datastring_msg;
 }
@@ -444,7 +402,7 @@ String RemoteLogger::low_pwr_prep_msg(){
 
     SD.begin(chipSelect);       //start the SD card connection
 
-    char buf[csv_setting.length()+1];   // Serial.println(1);  /** TODO: remove */
+    char buf[csv_setting.length()+1];  
     csv_setting.toCharArray(buf, csv_setting.length()+1); 
     CSV_Parser cp(buf, true, ',');      
     cp.readSDfile("/HOURLY.csv");       
@@ -779,7 +737,6 @@ String RemoteLogger::sample_analite_195(int analogDataPin, int wiperSetPin, int 
  * triggerPin: digital output controlling ranger active time, see ranger docs for setup
  * pulseInputPin: digital input to collect data, see ranger docs for setup
  * 
- * TODO: should this be returned as a string for continuity? or left as long for memory efficiency?
  */
 String RemoteLogger::sample_ultrasonic(int powerPin, int triggerPin, int pulseInputPin){
     pinMode(powerPin, OUTPUT);
