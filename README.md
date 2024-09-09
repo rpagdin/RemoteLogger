@@ -147,9 +147,8 @@ Be careful when wiring your TPL chip and using a Feather that has a TPL chip att
 ### Field deployment and testing
 ### Accessing data from MoF database
 If you have arranged with Alex Bevington to have your RockBlock units send data to his database hosted and managed by the BC Ministry of Forests, or if you are just interested in seeing what some of the data looks like from the units that are active, data from the remote logger network can be accessed via an [online app](https://bcgov-env.shinyapps.io/nbchydro/). RockBlock IMEIs (IDs) must be known by the database to accept data, and messages must follow a set format so that the data can be extracted to store in the database.<br>
-*INSERT IMAGE*<br>
-<img src=docs/data-website-homepage.png width='500'><br>
-<img src=docs/data-website-homepage-2.png width='500'><br>
+<img src=docs/data-website-homepage.PNG width='500'><br>
+<img src=docs/data-website-homepage-2.PNG width='500'><br>
 A map is provided on the website to show the locations of active remote logger units and the time since their last message was received. <br>
 Not every active remote logger unit is outfitted with the same sensors or is even collecting the same type of data. Data can be selected by collected parameters or name so it is possible to download the data in CSV format only for relevant sites and dates. Sites can also be selected to view graphs including the most recent data.<br>
 For more information about the data and database, contact Alex Bevington at alexandre.bevington@gov.bc.ca. 
